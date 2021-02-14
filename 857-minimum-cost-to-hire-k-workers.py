@@ -1,22 +1,20 @@
-from heapq import heappush, heappop
-from math import inf
+from heapq import heappush, heappushpop
 
 
 class Solution:
-    def mincostToHireWorkers(self, quality: list[int], wage: list[int], K: int) -> float:
+    def mincostToHireWorkers(self, quality: list[int], wage: list[int], k: int) -> float:
         ratios = [wage[i] / quality[i] for i in range(len(wage))]
         workers = sorted(range(len(wage)), key=lambda i: (ratios[i], quality[i], wage[i]))
-        cost = inf
+        cost = None
         total = 0
         heap = []
         for i in workers:
-            heappush(heap, -quality[i])
             total += quality[i]
-
-            if len(heap) > K:
-                total += heappop(heap)
-
-            if len(heap) == K:
+            if len(heap) >= k:
+                total += heappushpop(heap, -quality[i])
                 cost = min(cost, ratios[i] * total)
-
+            else:
+                heappush(heap, -quality[i])
+                if len(heap) >= k:
+                    cost = ratios[i] * total
         return cost
