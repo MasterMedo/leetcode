@@ -1,60 +1,55 @@
 class LRUCache:
     class Node:
-        def __init__(self, key, val=0, prev=None, next_=None):
+        def __init__(self, key=0, val=0, left=None, right=None):
             self.key = key
             self.val = val
-            self.prev = prev
-            self.next = next_
+            self.left = left
+            self.right = right
 
     def __init__(self, capacity: int):
         self.capacity = capacity
-        self.cache = {}
-        self.head = None
-        self.tail = None
+        self.head = LRUCache.Node()
+        self.tail = self.head
+        self.keys = {}
+
+    def _prefix(self, node: Node) -> None:
+        right = self.head.right
+        node.right = right
+        node.left = self.head
+        self.head.right = node
+        if right is not None:
+            right.left = node
+
+        if self.tail.right is not None:
+            self.tail = self.tail.right
+
+    def _move(self, key: int) -> None:
+        node = self.keys[key]
+        if node.left is not self.head:
+            if node == self.tail:
+                self.tail = node.left
+            node.left.right = node.right
+            if node.right is not None:
+                node.right.left = node.left
+            self._prefix(node)
 
     def get(self, key: int) -> int:
-        if key not in self.cache:
-            return -1
-
-        node = self.cache[key]
-        if node == self.tail:
-            return node.val
-
-        prev = node.prev
-        next_ = node.next
-        if prev is not None:
-            prev.next = next_
-
-        if next_ is not None:
-            next_.prev = prev
-
-        self.tail.next = node
-        node.prev = self.tail
-        self.tail = node
-        if node == self.head and self.head.next is not None:
-            self.head = self.head.next
-            self.head.prev = None
-
-        node.next = None
-        return node.val
+        if key in self.keys:
+            self._move(key)
+            return self.keys[key].val
+        return -1
 
     def put(self, key: int, value: int) -> None:
-        if key in self.cache:
-            self.get(key)
-            self.tail.val = value
+        if key in self.keys:
+            self.keys[key].val = value
+            self._move(key)
+            return
 
-        else:
-            node = LRUCache.Node(key, value, self.tail)
-            if self.tail is None:
-                self.head = node
-                self.tail = node
-            else:
-                self.tail.next = node
-                self.tail = node
+        if len(self.keys) >= self.capacity:
+            del self.keys[self.tail.key]
+            self.tail = self.tail.left
+            self.tail.right = None
 
-            if len(self.cache) >= self.capacity:
-                del self.cache[self.head.key]
-                self.head = self.head.next
-                self.head.prev = None
-
-            self.cache[key] = node
+        node = LRUCache.Node(key, value)
+        self._prefix(node)
+        self.keys[key] = node
