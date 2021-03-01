@@ -1,4 +1,5 @@
 from collections import deque
+from bisect import bisect_left
 
 
 class Solution:
@@ -8,7 +9,9 @@ class Solution:
         seen[0][0] = True
         t = 0
         front = deque([(0, 0)])
-        for t in range(max(n for row in grid for n in row) + 1):
+        values = sorted([n for row in grid for n in row])
+        i = bisect_left(values, max(grid[0][0], grid[-1][-1]))
+        for t in values[i:]:
             next_front = deque()
             while front:
                 r, c = front.pop()
