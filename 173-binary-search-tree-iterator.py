@@ -1,25 +1,19 @@
-def iterator(node: TreeNode) -> int:
-    if node is not None:
-        yield from iterator(node.left)
-        yield node.val
-        yield from iterator(node.right)
-
-
 class BSTIterator:
     def __init__(self, root: TreeNode):
-        self.iter = iterator(root)
-        self.traverse()
+        self.stack = []
+        self._leftmost_inorder(root)
 
-    def traverse(self):
-        try:
-            self.val = next(self.iter)
-        except Exception:
-            self.val = None
+    def _leftmost_inorder(self, root):
+        while root:
+            self.stack.append(root)
+            root = root.left
 
     def next(self) -> int:
-        val = self.val
-        self.traverse()
-        return val
+        topmost_node = self.stack.pop()
+        if topmost_node.right:
+            self._leftmost_inorder(topmost_node.right)
+
+        return topmost_node.val
 
     def hasNext(self) -> bool:
-        return self.val is not None
+        return len(self.stack) > 0
