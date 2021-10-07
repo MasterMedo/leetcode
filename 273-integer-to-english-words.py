@@ -81,7 +81,7 @@ class Solution:
 
         return " ".join(self.int_to_words(n))
 
-    def int_to_words(self, n: int, i: int = 1) -> list[int]:
+    def int_to_words(self, n: int, i: int = 1) -> list[str]:
         global names, numbers
         words = []
         while i < len(numbers):
