@@ -1,11 +1,15 @@
+from functools import cache
+
+
 class Solution:
-    def combine(self, n: int, k: int) -> List[List[int]]:
+    @cache
+    def combine(self, n: int, k: int, d: int = 0) -> List[List[int]]:
         if k <= 0:
             return [[]]
 
-        arr = self.combine(n, k - 1)
         result = []
-        for i in range(1, n):
+        for i in range(d + 1, n + 2 - k):
+            arr = self.combine(n, k - 1, i)
             for comb in arr:
                 result.append([i, *comb])
 
