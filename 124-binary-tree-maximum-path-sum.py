@@ -1,24 +1,24 @@
+from math import inf
+
+
 class Solution:
-    def maxPathSum(self, root: TreeNode) -> int:
-        def helper(root):
-            best = root.val
-            left = right = 0
-            if root.left is not None:
-                x, left = helper(root.left)
-                if x > best:
-                    best = x
-            if root.right is not None:
-                x, right = helper(root.right)
-                if x > best:
-                    best = x
+    def maxPathSum(self, root: Optional[TreeNode]) -> int:
+        global path_sum
 
-            best_without = max(
-                best,
-                right + root.val + left,
-                right + root.val,
-                left + root.val
-            )
-            best_with = root.val + max(right, left, 0)
-            return best_without, best_with
+        def f(root: Optional[TreeNode]) -> int:
+            global path_sum
+            if root is None:
+                return 0
 
-        return max(helper(root))
+            if root.left is None and root.right is None:
+                path_sum = max(path_sum, root.val)
+                return max(0, root.val)
+
+            left = f(root.left)
+            right = f(root.right)
+            path_sum = max(path_sum, left + right + root.val)
+            return max(0, max(left, right) + root.val)
+
+        path_sum = -inf
+        f(root)
+        return path_sum
