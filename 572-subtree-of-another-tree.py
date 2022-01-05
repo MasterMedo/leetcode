@@ -2,27 +2,26 @@ class Solution:
     def isSubtree(
         self, root: Optional[TreeNode], subRoot: Optional[TreeNode]
     ) -> bool:
-        def find_candidates(node):
+        def merkle(node):
+            if node is None:
+                return 0
+
+            node.merkle = hash(
+                " ".join(
+                    map(str, (merkle(node.left), node.val, merkle(node.right)))
+                )
+            )
+            return node.merkle
+
+        def traverse(node):
             if node is None:
                 return False
 
-            if node.val == subRoot.val:
-                if is_equal(node, subRoot):
-                    return True
-
-            return find_candidates(node.left) or find_candidates(node.right)
-
-        def is_equal(root, node):
-            if root is None and node is None:
+            if node.merkle == subRoot.merkle:
                 return True
 
-            if root is None or node is None:
-                return False
+            return traverse(node.left) or traverse(node.right)
 
-            return (
-                root.val == node.val
-                and is_equal(root.left, node.left)
-                and is_equal(root.right, node.right)
-            )
-
-        return find_candidates(root)
+        merkle(root)
+        merkle(subRoot)
+        return traverse(root)
