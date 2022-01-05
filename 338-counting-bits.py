@@ -1,10 +1,7 @@
 class Solution:
     def countBits(self, n: int) -> List[int]:
-        def bitcount(n):
-            cnt = 0
-            while n:
-                n &= n - 1
-                cnt += 1
-            return cnt
+        arr = [0] * (n + 1)
+        for i in range(1, n + 1):
+            arr[i] = arr[i >> 1] + (i & 1)
 
-        return [bitcount(i) for i in range(n + 1)]
+        return arr
