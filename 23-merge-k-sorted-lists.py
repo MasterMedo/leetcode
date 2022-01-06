@@ -1,21 +1,19 @@
-from heapq import heappush, heappop
+from heapq import merge
 
 
 class Solution:
-    def mergeKLists(self, lists: list[ListNode]) -> ListNode:
-        visit = []
-        for i, head in enumerate(lists):
-            if head is not None:
-                heappush(visit, (head.val, i))
+    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
+        def iterator(node: ListNode):
+            while node is not None:
+                yield node.val
+                node = node.next
 
-        dummy = node = ListNode()
-        while visit:
-            _, i = heappop(visit)
-            node.next = lists[i]
+        if not lists:
+            return None
+
+        head = node = ListNode()
+        for n in merge(*map(iterator, lists)):
+            node.next = ListNode(n)
             node = node.next
-            lists[i] = lists[i].next
-            if lists[i] is not None:
-                heappush(visit, (lists[i].val, i))
 
-        node.next = None
-        return dummy.next
+        return head.next
