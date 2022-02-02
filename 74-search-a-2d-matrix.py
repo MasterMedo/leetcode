@@ -1,12 +1,17 @@
-from bisect import bisect_left
-
-
 class Solution:
-    def searchMatrix(self, matrix: list[list[int]], target: int) -> bool:
-        for row in matrix:
-            if row[0] <= target <= row[-1]:
-                if row[bisect_left(row, target)] == target:
-                    return True
-                return False
+    def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
+        lo = 0
+        hi = len(matrix) * len(matrix[0]) - 1
+        while lo < hi:
+            mid = (lo + hi) // 2
+            r, c = divmod(mid, len(matrix[0]))
+            if matrix[r][c] < target:
+                lo = mid + 1
+            elif matrix[r][c] > target:
+                hi = mid
+            else:
+                lo = mid
+                break
 
-        return False
+        r, c = divmod(lo, len(matrix[0]))
+        return matrix[r][c] == target
