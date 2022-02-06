@@ -1,14 +1,30 @@
-class Solution:
-    def checkInclusion(self, a: str, b: str) -> bool:
-        count = [0] * 26
-        for c in a:
-            count[ord(c) - 97] += 1
+from collections import defaultdict
 
-        window = [0] * 26
-        for i in range(len(b)):
-            if i >= len(a):
-                window[ord(b[i-len(a)]) - 97] -= 1
-            window[ord(b[i]) - 97] += 1
-            if count == window:
+
+class Solution:
+    def checkInclusion(self, s1: str, s2: str) -> bool:
+        if len(s2) < len(s1):
+            return False
+
+        seen = defaultdict(int)
+        need = defaultdict(int)
+        for i in range(len(s1)):
+            seen[s2[i]] += 1
+            need[s1[i]] += 1
+
+        left = sum(need[char] > seen[char] for char in need)
+        for i in range(len(s1), len(s2)):
+            if left == 0:
                 return True
-        return False
+
+            char = s2[i - len(s1)]
+            seen[char] -= 1
+            if need[char] == seen[char] + 1:
+                left += 1
+
+            char = s2[i]
+            seen[char] += 1
+            if need[char] == seen[char]:
+                left -= 1
+
+        return left == 0
